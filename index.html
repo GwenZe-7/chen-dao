@@ -1,0 +1,2227 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>晨岛</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warm: { bg: 'var(--bg, #FEF9F0)', text: '#3D3226', mute: '#8C7E6F', amber: 'var(--accent, #E89540)' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #FEF9F0;
+      --night-bg: #F2E8DC;
+      --accent: #E89540;
+      --accent-hover: #D98535;
+      --accent-light: #FFF7EF;
+      --accent-rgb: 232,149,64;
+    }
+    body {
+      background-color: var(--bg); color: #3D3226; margin: 0; min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background-image: radial-gradient(ellipse 100% 240px at 50% 0%, rgba(var(--accent-rgb),0.05) 0%, transparent 60%);
+      background-repeat: no-repeat;
+      transition: background-color 0.6s ease;
+    }
+    /* 夜间模式 */
+    body.night-mode {
+      background-color: var(--night-bg);
+      background-image: radial-gradient(ellipse 100% 280px at 50% 0%, rgba(var(--accent-rgb),0.10) 0%, transparent 65%);
+      background-repeat: no-repeat;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.7s ease-out both; }
+    .fade-in-d1 { animation-delay: 0.15s; opacity: 0; }
+    .fade-in-d2 { animation-delay: 0.3s;  opacity: 0; }
+    .fade-in-d3 { animation-delay: 0.45s; opacity: 0; }
+    .fade-in-d4 { animation-delay: 0.6s;  opacity: 0; }
+
+    .time-text { font-size: 56px; font-weight: 300; letter-spacing: -1px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    @media (max-width: 768px) { .time-text { font-size: 42px; } }
+    .greeting-text { font-size: 18px; color: #8C7E6F; line-height: 1.8; max-width: 520px; }
+
+    /* ====== 时间显示框 ====== */
+    .time-box-wrapper {
+      display: flex; justify-content: center; margin-bottom: 2.5rem;
+    }
+    .time-box {
+      display: inline-flex; align-items: center; gap: 20px;
+      border: 1.5px solid #3D3226; border-radius: 18px;
+      padding: 14px 28px;
+      background: rgba(255,252,245,0.58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(61,50,38,0.06);
+    }
+    @media (max-width: 768px) {
+      .time-box {
+        gap: 10px; padding: 12px 16px; border-radius: 16px;
+        flex-wrap: wrap; justify-content: center;
+      }
+    }
+    .time-box-brand {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 15px; color: #8C7E6F; letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .time-box-divider {
+      width: 1px; height: 22px; background: #E0D8CC; flex-shrink: 0;
+    }
+    @media (max-width: 768px) {
+      .time-box-divider { display: none; }
+    }
+    .time-box-clock {
+      font-size: 42px; font-weight: 300; letter-spacing: -1px; line-height: 1;
+      font-variant-numeric: tabular-nums; color: #3D3226; white-space: nowrap;
+    }
+    @media (max-width: 768px) {
+      .time-box-clock { font-size: 32px; }
+    }
+    .time-box-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      position: relative; display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.25s ease;
+    }
+    @media (max-width: 768px) {
+      .time-box-icon { width: 36px; height: 36px; }
+    }
+
+    /* 太阳图标 */
+    .sun-icon-svg { width: 44px; height: 44px; display: block; }
+    @media (max-width: 768px) { .sun-icon-svg { width: 36px; height: 36px; } }
+    .sun-core-shape { fill: #F5C04A; }
+    .sun-glow-circle { animation: sunGlowBreathe 3.2s ease-in-out infinite; }
+    @keyframes sunGlowBreathe {
+      0%, 100% { opacity: 0.65; }
+      50% { opacity: 1; }
+    }
+    .sun-rays-group {
+      animation: sunRaySpin 28s linear infinite;
+      transform-origin: center; transform-box: fill-box;
+    }
+    @keyframes sunRaySpin { to { transform: rotate(360deg); } }
+
+    /* 月亮图标 */
+    .moon-icon-svg {
+      width: 44px; height: 44px; display: block;
+      animation: moonFloat 5s ease-in-out infinite;
+    }
+    @media (max-width: 768px) { .moon-icon-svg { width: 36px; height: 36px; } }
+    @keyframes moonFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .moon-crescent-shape { fill: #EEC040; }
+    .moon-glow-circle { animation: moonGlowBreathe 4.5s ease-in-out infinite; }
+    @keyframes moonGlowBreathe {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 0.95; }
+    }
+    .star-dot { fill: #E8CC70; }
+    .star-1 { animation: starTwinkle 2.4s ease-in-out infinite; }
+    .star-2 { animation: starTwinkle 3.0s ease-in-out infinite; animation-delay: 0.7s; }
+    .star-3 { animation: starTwinkle 2.7s ease-in-out infinite; animation-delay: 1.5s; }
+    @keyframes starTwinkle {
+      0%, 100% { opacity: 0.30; }
+      50% { opacity: 1; }
+    }
+
+    /* 天气卡片 */
+    .weather-card {
+      background: #FFFFFF; border-radius: 16px; padding: 24px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+    }
+    .weather-now { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+    .weather-meta, .forecast-row { position: relative; z-index: 1; }
+
+    /* ====== 季节氛围层 ====== */
+    .season-ambient {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    /* 粒子基类 */
+    .sa-particle {
+      position: absolute; top: -30px; pointer-events: none; opacity: 0;
+    }
+    /* 花瓣 */
+    .sa-petal {
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #FDE4EC, #F090A8);
+      box-shadow: 0 1px 4px rgba(210,140,160,0.25);
+      animation: petalDrift linear infinite;
+    }
+    /* 树叶 */
+    .sa-leaf {
+      width: 9px; height: 15px;
+      background: radial-gradient(ellipse at 40% 35%, #F09860, #D06838);
+      border-radius: 45% 5px 50% 5px;
+      box-shadow: 0 1px 3px rgba(180,90,40,0.2);
+      animation: leafDrift linear infinite;
+    }
+    /* 雪花 */
+    .sa-snow {
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #FFFFFF, #F6F2EE);
+      box-shadow: 0 1px 5px rgba(160,155,150,0.25);
+      animation: snowDrift linear infinite;
+    }
+    /* 阳光光束 */
+    .sa-sunbeam {
+      position: absolute; top: 0; left: 5%;
+      width: 32%; height: 100%;
+      background: linear-gradient(160deg, rgba(var(--accent-rgb,240,160,64),0.14) 0%, rgba(var(--accent-rgb,240,160,64),0.05) 30%, rgba(var(--accent-rgb,240,160,64),0.01) 55%, transparent 70%);
+      transform: skewX(-7deg); transform-origin: top left;
+      pointer-events: none;
+      animation: beamSway 28s ease-in-out infinite;
+    }
+    .sa-sunbeam:nth-child(2) {
+      left: 42%; width: 24%; height: 100%;
+      background: linear-gradient(165deg, rgba(var(--accent-rgb,240,160,64),0.10) 0%, rgba(var(--accent-rgb,240,160,64),0.03) 28%, rgba(var(--accent-rgb,240,160,64),0.01) 50%, transparent 65%);
+      transform: skewX(-5deg); transform-origin: top left;
+      animation-delay: -10s; animation-duration: 22s;
+    }
+
+    /* === 关键帧 === */
+    @keyframes petalDrift {
+      0%   { transform: translateY(-40px) translateX(0)    rotate(0deg);   opacity: 0; }
+      3%   { opacity: 0.85; }
+      90%  { opacity: 0.5; }
+      100% { transform: translateY(110vh) translateX(40px) rotate(380deg); opacity: 0; }
+    }
+    @keyframes leafDrift {
+      0%   { transform: translateY(-40px) translateX(0)    rotate(0deg);    opacity: 0; }
+      3%   { opacity: 0.78; }
+      92%  { opacity: 0.45; }
+      100% { transform: translateY(110vh) translateX(-30px) rotate(460deg); opacity: 0; }
+    }
+    @keyframes snowDrift {
+      0%   { transform: translateY(-40px) translateX(0);    opacity: 0; }
+      4%   { opacity: 0.85; }
+      93%  { opacity: 0.5; }
+      100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
+    }
+    @keyframes beamSway {
+      0%, 100% { transform: skewX(-7deg) translateX(0); }
+      50%      { transform: skewX(-7deg) translateX(24px); }
+    }
+    @keyframes beamSway2 {
+      0%, 100% { transform: skewX(-5deg) translateX(0); }
+      50%      { transform: skewX(-5deg) translateX(-16px); }
+    }
+    .sa-sunbeam:nth-child(2) { animation-name: beamSway2; }
+    /* ====== CSS 天气场景 ====== */
+    .weather-scene {
+      width: 66px; height: 66px; flex-shrink: 0;
+      position: relative; overflow: visible;
+    }
+    @media (max-width: 768px) { .weather-scene { width: 56px; height: 56px; } }
+
+    /* 太阳 + 光芒 */
+    .scene-sunny {
+      width: 100%; height: 100%; position: relative;
+      animation: sunSpin 30s linear infinite;
+      background: radial-gradient(circle at center, rgba(var(--accent-rgb, 232,149,64),0.08) 0%, transparent 65%);
+      border-radius: 50%;
+    }
+    .scene-sunny .sun-core {
+      position: absolute; top: 50%; left: 50%;
+      width: 22px; height: 22px; margin: -11px;
+      background: var(--accent, #E89540); border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent, #E89540), 0 0 22px rgba(var(--accent-rgb, 232,149,64),0.35);
+    }
+    .scene-sunny .ray {
+      position: absolute; top: 50%; left: 50%;
+      width: 2px; height: 15px; margin-top: -26px; margin-left: -1px;
+      background: linear-gradient(to top, rgba(var(--accent-rgb, 232,149,64),0.7), rgba(var(--accent-rgb, 232,149,64),0.05));
+      border-radius: 1px; transform-origin: 1px 26px;
+    }
+    @keyframes sunSpin { to { transform: rotate(360deg); } }
+
+    /* 云朵 */
+    .cloud {
+      position: absolute; background: #D0CBC2; border-radius: 22px;
+    }
+    .cloud::before, .cloud::after {
+      content: ''; position: absolute; background: #D0CBC2; border-radius: 50%;
+    }
+    .cloud.c1 { /* 大云 */
+      width: 34px; height: 13px; bottom: 10px;
+      animation: cloudDriftA 16s ease-in-out infinite;
+    }
+    .cloud.c1::before { width: 15px; height: 15px; top: -7px; left: 3px; }
+    .cloud.c1::after  { width: 11px; height: 11px; top: -4px; left: 18px; }
+    .cloud.c2 { /* 中云 */
+      width: 26px; height: 10px; bottom: 22px;
+      animation: cloudDriftB 12s ease-in-out infinite;
+    }
+    .cloud.c2::before { width: 12px; height: 12px; top: -5px; left: 2px; }
+    .cloud.c2::after  { width: 9px;  height: 9px;  top: -3px; left: 14px; }
+    .cloud.c3 { /* 小云 */
+      width: 20px; height: 8px; bottom: 30px;
+      animation: cloudDriftA 20s ease-in-out infinite;
+    }
+    .cloud.c3::before { width: 10px; height: 10px; top: -4px; left: 1px; }
+    .cloud.c3::after  { width: 7px;  height: 7px;  top: -2px; left: 11px; }
+    @keyframes cloudDriftA { 0%,100% { transform: translateX(-4px); } 50% { transform: translateX(8px); } }
+    @keyframes cloudDriftB { 0%,100% { transform: translateX(6px);  } 50% { transform: translateX(-5px); } }
+
+    /* 多云：太阳 + 云 */
+    .scene-cloudy { width: 100%; height: 100%; position: relative; }
+    .scene-cloudy .sun-small {
+      position: absolute; top: 10px; right: 12px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent, #E89540);
+      box-shadow: 0 0 10px rgba(var(--accent-rgb, 232,149,64),0.25);
+    }
+
+    /* 阴天 */
+    .scene-overcast { width: 100%; height: 100%; position: relative; }
+
+    /* 雨天 */
+    .scene-rain { width: 100%; height: 100%; position: relative; }
+    .scene-rain .cloud-top {
+      position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 13px; background: #C4BFB6; border-radius: 20px;
+    }
+    .scene-rain .cloud-top::before { content:''; position:absolute; width:14px; height:14px; background:#C4BFB6; border-radius:50%; top:-6px; left:3px; }
+    .scene-rain .cloud-top::after  { content:''; position:absolute; width:10px; height:10px; background:#C4BFB6; border-radius:50%; top:-3px; left:20px; }
+    .rain-line {
+      position: absolute; top: 24px;
+      width: 1.5px; height: 11px;
+      background: linear-gradient(to bottom, rgba(110,140,165,0.7), transparent);
+      transform: rotate(16deg);
+      animation: rainDrop 0.9s linear infinite;
+    }
+    @keyframes rainDrop {
+      0%   { transform: rotate(16deg) translateY(-6px); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: rotate(16deg) translateY(36px); opacity: 0; }
+    }
+
+    /* 雪天 */
+    .scene-snow { width: 100%; height: 100%; position: relative; }
+    .scene-snow .cloud-top {
+      position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 13px; background: #CDC8C0; border-radius: 20px;
+    }
+    .scene-snow .cloud-top::before { content:''; position:absolute; width:14px; height:14px; background:#CDC8C0; border-radius:50%; top:-6px; left:3px; }
+    .scene-snow .cloud-top::after  { content:''; position:absolute; width:10px; height:10px; background:#CDC8C0; border-radius:50%; top:-3px; left:20px; }
+    .snow-dot {
+      position: absolute; top: 20px;
+      background: #F0EDE6; border-radius: 50%;
+      animation: snowFloat linear infinite;
+    }
+    @keyframes snowFloat {
+      0%   { transform: translateY(-8px) translateX(0); opacity: 0; }
+      15%  { opacity: 0.85; }
+      85%  { opacity: 0.85; }
+      100% { transform: translateY(40px) translateX(6px); opacity: 0; }
+    }
+    .weather-temp { font-size: 38px; font-weight: 300; color: #3D3226; line-height: 1.1; }
+    .weather-temp sup { font-size: 18px; font-weight: 300; vertical-align: super; }
+    .weather-meta { display: flex; gap: 20px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #F5F0E8; }
+    .weather-meta-item { font-size: 13px; color: #8C7E6F; }
+    .weather-meta-item span { color: #3D3226; }
+    .forecast-row { display: flex; gap: 8px; margin-top: 16px; }
+    .forecast-day { flex: 1; text-align: center; background: #FFFBF5; border-radius: 10px; padding: 10px 6px; }
+    .forecast-day .day-label { font-size: 12px; color: #8C7E6F; margin-bottom: 4px; }
+    .forecast-day .day-emoji { font-size: 22px; margin: 4px 0; }
+    .forecast-day .day-temp { font-size: 12px; color: #8C7E6F; }
+    .weather-hint { color: #8C7E6F; font-size: 14px; text-align: center; padding: 20px 0; }
+    .weather-fallback { margin-top: 12px; }
+    .weather-fallback .hint-text { font-size: 13px; color: #8C7E6F; margin-bottom: 8px; }
+    .weather-fallback input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #E8E0D5; border-radius: 10px;
+      background: #FFFEFA; color: #3D3226; font-size: 14px; outline: none; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .weather-fallback input:focus { border-color: var(--accent, #E89540); box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 232,149,64),0.08); }
+    .weather-fallback input::placeholder { color: #BFB5A5; }
+
+    /* 待办卡片 */
+    .todo-card {
+      background: #FFFFFF; border-radius: 16px; padding: 24px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+    }
+    .todo-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+    }
+    .todo-header-left { display: flex; align-items: center; gap: 8px; }
+    .todo-header-right { display: flex; align-items: center; gap: 4px; }
+    .todo-title { font-size: 13px; color: #8C7E6F; letter-spacing: 1px; }
+    .todo-parse-badge {
+      font-size: 11px; color: var(--accent, #E89540); background: var(--accent-light, #FFF7EF); padding: 2px 8px; border-radius: 10px;
+      display: none;
+    }
+    .history-header-btn {
+      background: none; border: 1px solid #E8E0D5; border-radius: 8px; padding: 4px 10px;
+      font-size: 12px; color: #8C7E6F; cursor: pointer; font-family: inherit;
+      transition: all 0.2s; display: flex; align-items: center; gap: 3px; white-space: nowrap;
+    }
+    .history-header-btn:hover { color: var(--accent, #E89540); border-color: var(--accent, #E89540); }
+    .history-header-btn .hbadge {
+      background: var(--accent, #E89540); color: #fff; font-size: 10px; min-width: 16px; height: 16px;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    }
+    .collapse-btn {
+      background: none; border: none; font-size: 16px; cursor: pointer; color: #8C7E6F;
+      padding: 4px; transition: transform 0.3s; line-height: 1;
+    }
+    .collapse-btn.collapsed { transform: rotate(-90deg); }
+
+    .todo-body { overflow: hidden; transition: max-height 0.35s ease, opacity 0.25s ease; max-height: 800px; opacity: 1; }
+    .todo-body.collapsed { max-height: 0; opacity: 0; }
+
+    .todo-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .todo-input {
+      flex: 1; padding: 10px 14px; border: 1.5px solid #E8E0D5; border-radius: 10px;
+      background: #FFFEFA; color: #3D3226; font-size: 14px; outline: none; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .todo-input:focus { border-color: var(--accent, #E89540); box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 232,149,64),0.08); }
+    .todo-input::placeholder { color: #BFB5A5; }
+    .todo-btn {
+      padding: 10px 16px; background: var(--accent, #E89540); color: #fff; border: none; border-radius: 10px;
+      font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .todo-btn:hover { background: var(--accent-hover, #D98535); }
+    .todo-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .todo-list { max-height: 340px; overflow-y: auto; }
+    .todo-item {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+      border-bottom: 1px solid #F5F0E8; cursor: pointer; transition: opacity 0.2s;
+    }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-item.done .todo-text { text-decoration: line-through; color: #C0B5A5; }
+    .todo-dot {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid #D5CCC0;
+      flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; font-size: 10px; color: transparent;
+    }
+    .todo-item.done .todo-dot { background: var(--accent, #E89540); border-color: var(--accent, #E89540); color: #fff; }
+    .todo-text { flex: 1; font-size: 14px; line-height: 1.5; }
+    .todo-empty { text-align: center; color: #BFB5A5; font-size: 14px; padding: 32px 0; }
+
+    /* 操作按钮栏 */
+    .todo-actions {
+      display: flex; gap: 8px; margin-top: 16px; padding-top: 14px;
+      border-top: 1px solid #F5F0E8; justify-content: flex-end;
+    }
+    .btn-cancel {
+      padding: 8px 16px; background: none; color: #8C7E6F; border: 1px solid #E8E0D5;
+      border-radius: 10px; font-size: 13px; cursor: pointer; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { color: #C0392B; border-color: #E8C4C4; background: #FFF5F5; }
+    .btn-confirm {
+      padding: 8px 16px; background: var(--accent, #E89540); color: #fff; border: none;
+      border-radius: 10px; font-size: 13px; cursor: pointer; font-family: inherit;
+      transition: all 0.2s; display: flex; align-items: center; gap: 4px;
+    }
+    .btn-confirm:hover { background: var(--accent-hover, #D98535); }
+    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .todo-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid #F5F0E8; }
+    .todo-footer-text { font-size: 12px; color: #BFB5A5; }
+    .todo-clear-btn { font-size: 12px; color: #8C7E6F; background: none; border: 1px solid #E8E0D5; border-radius: 8px; padding: 4px 10px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .todo-clear-btn:hover { color: var(--accent, #E89540); border-color: var(--accent, #E89540); }
+
+    /* ====== 今日总结（夜间模式） ====== */
+    .summary-section {
+      background: #FFFFFF; border-radius: 16px; padding: 22px 24px; margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+      text-align: center; display: none; max-width: 520px; margin-left: auto; margin-right: auto;
+    }
+    .summary-stats {
+      font-size: 17px; color: #3D3226; font-weight: 500; margin-bottom: 6px;
+    }
+    .summary-stats .highlight { color: var(--accent, #E89540); font-weight: 600; }
+    .summary-feedback { font-size: 14px; color: #8C7E6F; line-height: 1.6; }
+
+    /* ====== 晚间日记 ====== */
+    .diary-card {
+      background: #FFFFFF; border-radius: 16px; padding: 24px; margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+      display: none;
+    }
+    .diary-textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #E8E0D5; border-radius: 10px;
+      background: #FFFEFA; color: #3D3226; font-size: 14px; outline: none; font-family: inherit;
+      transition: border-color 0.2s; resize: vertical; min-height: 80px; box-sizing: border-box;
+      line-height: 1.6;
+    }
+    .diary-textarea:focus { border-color: var(--accent, #E89540); box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 232,149,64),0.08); }
+    .diary-textarea::placeholder { color: #BFB5A5; }
+    .diary-save-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+    .diary-saved-hint { font-size: 12px; color: #C0B5A5; transition: opacity 0.3s; }
+    .diary-history-list { margin-top: 16px; padding-top: 14px; border-top: 1px solid #F5F0E8; display: none; }
+    .diary-history-item {
+      padding: 12px; border: 1px solid #F0EBE2; border-radius: 10px; margin-bottom: 8px;
+      cursor: default; transition: background 0.15s;
+    }
+    .diary-history-item:last-child { margin-bottom: 0; }
+    .diary-history-item .dh-date { font-size: 13px; color: #3D3226; font-weight: 500; margin-bottom: 4px; }
+    .diary-history-item .dh-preview { font-size: 13px; color: #8C7E6F; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .diary-history-empty { text-align: center; color: #BFB5A5; font-size: 13px; padding: 16px 0; }
+
+    /* 历史清单 Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(61,50,38,0.3); z-index: 100;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-panel {
+      background: #FFFFFF; border-radius: 20px; padding: 28px; width: 90%; max-width: 440px;
+      max-height: 70vh; display: flex; flex-direction: column;
+      box-shadow: 0 4px 24px rgba(61,50,38,0.15);
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-title { font-size: 16px; color: #3D3226; font-weight: 500; }
+    .modal-close {
+      background: none; border: none; font-size: 20px; cursor: pointer; color: #8C7E6F;
+      padding: 4px 8px; border-radius: 8px; transition: all 0.2s;
+    }
+    .modal-close:hover { background: #F5F0E8; }
+    .modal-list { flex: 1; overflow-y: auto; }
+    .history-entry {
+      padding: 14px; border: 1px solid #F0EBE2; border-radius: 12px; margin-bottom: 10px;
+    }
+    .history-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .history-entry-date { font-size: 13px; color: #3D3226; font-weight: 500; }
+    .history-entry-delete {
+      background: none; border: none; color: #BFB5A5; cursor: pointer; font-size: 14px;
+      padding: 2px 6px; border-radius: 4px; transition: all 0.15s;
+    }
+    .history-entry-delete:hover { color: #C0392B; background: #FFF5F5; }
+    .history-entry-items { font-size: 13px; color: #8C7E6F; line-height: 1.8; }
+    .history-entry-item { padding-left: 4px; }
+    .history-entry-item.done { text-decoration: line-through; color: #C0B5A5; }
+    .history-empty { text-align: center; color: #BFB5A5; font-size: 14px; padding: 32px 0; }
+
+    /* ====== AI 对话悬浮按钮 & 对话框 ====== */
+    .chat-fab {
+      position: fixed; bottom: 24px; right: 24px; z-index: 150;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--accent, #E89540); color: #fff; border: none;
+      font-size: 22px; cursor: pointer;
+      box-shadow: 0 2px 12px rgba(var(--accent-rgb, 232,149,64),0.3);
+      transition: all 0.25s; display: flex; align-items: center; justify-content: center;
+    }
+    .chat-fab:hover { background: var(--accent-hover, #D98535); transform: scale(1.06); box-shadow: 0 4px 18px rgba(var(--accent-rgb, 232,149,64),0.4); }
+    .chat-fab:active { transform: scale(0.96); }
+    @media (max-width: 768px) {
+      .chat-fab { width: 44px; height: 44px; bottom: 20px; right: 16px; font-size: 20px; }
+    }
+
+    .chat-overlay {
+      position: fixed; inset: 0; background: rgba(61,50,38,0.3); z-index: 160;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .chat-overlay.show { display: flex; }
+    .chat-panel {
+      background: #FFFFFF; border-radius: 16px; width: 90%; max-width: 420px;
+      max-height: 72vh; display: flex; flex-direction: column;
+      box-shadow: 0 4px 24px rgba(61,50,38,0.15); overflow: hidden;
+    }
+    .chat-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid #F5F0E8;
+    }
+    .chat-panel-title { font-size: 13px; color: #8C7E6F; letter-spacing: 1px; }
+    .chat-panel-close {
+      background: none; border: none; font-size: 18px; cursor: pointer; color: #8C7E6F;
+      padding: 4px 8px; border-radius: 8px; transition: all 0.2s;
+    }
+    .chat-panel-close:hover { background: #F5F0E8; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px 20px; min-height: 100px; max-height: 340px;
+    }
+    .chat-empty-state { text-align: center; color: #BFB5A5; font-size: 14px; padding: 32px 16px; }
+    .chat-msg { margin-bottom: 14px; animation: fadeIn 0.3s ease-out; }
+    .chat-msg:last-child { margin-bottom: 0; }
+    .chat-msg-user { text-align: right; }
+    .chat-msg-bubble {
+      display: inline-block; max-width: 85%; padding: 10px 14px; border-radius: 14px;
+      font-size: 14px; line-height: 1.55; text-align: left; word-break: break-word;
+    }
+    .chat-msg-user .chat-msg-bubble {
+      background: var(--accent-light, #FFF7EF); color: #3D3226; border-bottom-right-radius: 4px;
+    }
+    .chat-msg-ai .chat-msg-bubble {
+      background: #F8F5F0; color: #3D3226; border-bottom-left-radius: 4px;
+    }
+    .chat-typing .chat-msg-bubble { color: #BFB5A5; font-style: italic; }
+    .chat-input-row {
+      display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #F5F0E8;
+    }
+    .chat-input {
+      flex: 1; padding: 10px 14px; border: 1.5px solid #E8E0D5; border-radius: 10px;
+      background: #FFFEFA; color: #3D3226; font-size: 14px; outline: none; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--accent, #E89540); box-shadow: 0 0 0 3px rgba(var(--accent-rgb, 232,149,64),0.08); }
+    .chat-input::placeholder { color: #BFB5A5; }
+    .chat-send-btn {
+      padding: 10px 16px; background: var(--accent, #E89540); color: #fff; border: none; border-radius: 10px;
+      font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .chat-send-btn:hover { background: var(--accent-hover, #D98535); }
+    .chat-send-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ====== 今日状态追踪 ====== */
+    .tracker-card {
+      background: #FFFFFF; border-radius: 16px; margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+      overflow: hidden;
+    }
+    .tracker-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; cursor: pointer; user-select: none;
+      transition: background 0.15s;
+    }
+    .tracker-header:hover { background: #FFFBF5; }
+    .tracker-title { font-size: 13px; color: #8C7E6F; letter-spacing: 1px; }
+    .tracker-arrow { font-size: 14px; color: #8C7E6F; transition: transform 0.3s; }
+    .tracker-arrow.open { transform: rotate(180deg); }
+    .tracker-body {
+      padding: 0 24px; max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+    .tracker-body.open { max-height: 500px; padding: 0 24px 24px 24px; }
+    .tracker-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #F5F0E8;
+    }
+    .tracker-label { font-size: 14px; color: #3D3226; }
+    .dot-rating { display: flex; gap: 8px; }
+    .dot {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid #D5CCC0;
+      cursor: pointer; transition: all 0.2s; background: transparent; display: inline-block;
+    }
+    .dot:hover { border-color: var(--accent, #E89540); }
+    .dot.active { background: var(--accent, #E89540); border-color: var(--accent, #E89540); }
+    @media (max-width: 768px) {
+      .dot { width: 32px; height: 32px; }
+      .dot-rating { gap: 10px; }
+    }
+
+    .habit-row {
+      display: flex; gap: 8px; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid #F5F0E8; flex-wrap: wrap;
+    }
+    .habit-btn {
+      flex: 1; min-width: 80px; padding: 10px 8px;
+      background: #FFFEFA; border: 1.5px solid #E8E0D5; border-radius: 10px;
+      font-size: 13px; color: #8C7E6F; cursor: pointer; font-family: inherit;
+      transition: all 0.2s; text-align: center; white-space: nowrap;
+    }
+    .habit-btn:hover { border-color: var(--accent, #E89540); color: var(--accent, #E89540); }
+    .habit-btn.active { background: var(--accent, #E89540); border-color: var(--accent, #E89540); color: #fff; }
+    @media (max-width: 768px) {
+      .habit-btn { font-size: 12px; padding: 10px 6px; min-width: 70px; }
+    }
+
+    .tracker-summary {
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid #F5F0E8;
+      text-align: center; font-size: 14px; color: #8C7E6F; line-height: 1.6;
+    }
+
+    /* ====== 内心气象 ====== */
+    .mood-card {
+      background: #FFFFFF; border-radius: 16px; padding: 20px 24px; margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(61,50,38,0.04), 0 6px 16px rgba(61,50,38,0.03);
+    }
+    .mood-row { display: flex; justify-content: space-around; align-items: flex-end; gap: 4px; }
+    .mood-day { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+    .mood-icon {
+      font-size: 28px; line-height: 1; cursor: default; position: relative;
+      transition: transform 0.2s; user-select: none;
+    }
+    .mood-icon:hover { transform: scale(1.25); }
+    @media (max-width: 768px) { .mood-icon { font-size: 24px; } }
+    .mood-label { font-size: 11px; color: #BFB5A5; white-space: nowrap; }
+    .mood-empty {
+      width: 24px; height: 24px; border: 2px dashed #DDD6CC; border-radius: 50%;
+      display: inline-block; transition: all 0.2s;
+    }
+    .mood-empty:hover { border-color: var(--accent, #E89540); }
+    @media (max-width: 768px) { .mood-empty { width: 20px; height: 20px; } }
+
+    /* 悬浮提示 */
+    .mood-icon[title] { cursor: help; }
+
+    /* ====== 季节切换器 ====== */
+    .season-dots {
+      position: fixed; bottom: 24px; left: 24px; z-index: 140;
+      display: flex; gap: 6px; opacity: 0.6; transition: opacity 0.3s;
+    }
+    .season-dots:hover { opacity: 1; }
+    @media (max-width: 768px) {
+      .season-dots { bottom: 20px; left: 12px; gap: 5px; }
+    }
+    .season-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1.5px solid #C0B5A5; background: transparent;
+      cursor: pointer; transition: all 0.2s; padding: 0;
+      outline: none; flex-shrink: 0;
+    }
+    .season-dot:hover { border-color: var(--accent, #E89540); }
+    .season-dot.active {
+      background: var(--accent, #E89540); border-color: var(--accent, #E89540);
+    }
+    @media (max-width: 768px) {
+      .season-dot { width: 12px; height: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====== 全页季节氛围层 ====== -->
+<div class="season-ambient" id="seasonAmbient"></div>
+
+<main class="max-w-5xl mx-auto px-6 py-10 md:py-14" style="position:relative;z-index:1;">
+
+  <!-- ====== 头部：时间框 ====== -->
+  <header class="time-box-wrapper fade-in">
+    <div class="time-box">
+      <!-- 问候前缀 -->
+      <span class="time-box-brand">
+        <svg width="24" height="24" viewBox="0 0 512 512" style="border-radius:5px;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#D6E4F0"/>
+              <stop offset="40%" stop-color="#EDE8DF"/>
+              <stop offset="100%" stop-color="#FEF9F0"/>
+            </linearGradient>
+            <linearGradient id="sunGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FADA9A"/>
+              <stop offset="50%" stop-color="#ECA248"/>
+              <stop offset="100%" stop-color="#E89540"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="102" fill="url(#sky2)"/>
+          <circle cx="256" cy="375" r="82" fill="url(#sunGrad2)"/>
+          <path d="M-10 520 L-10 415 Q256 348 522 405 L522 520 Z" fill="#C8BDB0"/>
+        </svg>晨岛
+      </span>
+      <!-- 分隔线 -->
+      <span class="time-box-divider"></span>
+      <!-- 时间数字 -->
+      <time class="time-box-clock" id="clock">--:--</time>
+      <!-- 动态图标 -->
+      <div class="time-box-icon" id="timeIcon"></div>
+    </div>
+  </header>
+
+  <!-- ====== 问候语 ====== -->
+  <section class="mb-12 md:mb-16 fade-in fade-in-d1">
+    <p class="greeting-text" id="greeting">--</p>
+  </section>
+
+  <!-- ====== 今日总结（夜间模式） ====== -->
+  <section class="summary-section fade-in fade-in-d2" id="daySummary">
+    <div class="summary-stats" id="summaryStats"></div>
+    <div class="summary-feedback" id="summaryFeedback"></div>
+  </section>
+
+  <!-- ====== 双栏：天气 + 今日焦点 ====== -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+
+    <!-- 天气 -->
+    <div class="weather-card fade-in fade-in-d2" id="weatherCard">
+      <div class="weather-hint" id="weatherLoading">正在获取天气...</div>
+      <div id="weatherContent" style="display:none;">
+        <div class="weather-now">
+          <div class="weather-scene" id="weatherScene"></div>
+          <div>
+            <div class="weather-temp" id="weatherTemp"></div>
+            <div class="text-xs text-warm-mute" id="weatherDesc"></div>
+          </div>
+        </div>
+        <div class="weather-meta">
+          <div class="weather-meta-item">💧 湿度 <span id="weatherHumidity"></span></div>
+          <div class="weather-meta-item">📍 <span id="weatherLocation"></span></div>
+        </div>
+        <div class="forecast-row" id="weatherForecast"></div>
+      </div>
+      <div class="weather-fallback" id="weatherFallback" style="display:none;">
+        <p class="hint-text">不知道你在哪，可以告诉我吗？</p>
+        <input type="text" id="cityInput" placeholder="输入城市名，如：北京">
+      </div>
+      <div class="weather-hint" id="weatherError" style="display:none;"></div>
+    </div>
+
+    <!-- AI 待办 -->
+    <div class="todo-card fade-in fade-in-d3" id="todoCard">
+    <!-- 卡片头部 -->
+    <div class="todo-header">
+      <div class="todo-header-left">
+        <span class="todo-title">AI 待办</span>
+        <span class="todo-parse-badge" id="parseBadge">AI 解析</span>
+      </div>
+      <div class="todo-header-right">
+        <button class="history-header-btn" id="historyBtn" title="历史清单">
+          📋 清单<span class="hbadge" id="historyBadge" style="display:none;">0</span>
+        </button>
+        <button class="collapse-btn" id="collapseBtn" title="收起/展开">▼</button>
+      </div>
+    </div>
+
+    <!-- 可折叠主体 -->
+    <div class="todo-body" id="todoBody">
+      <div class="todo-input-row">
+        <input type="text" class="todo-input" id="todoInput" placeholder="简单说说今天要做什么..." autocomplete="off">
+        <button class="todo-btn" id="todoParseBtn">✨ 解析</button>
+      </div>
+      <div class="todo-list" id="todoList"></div>
+      <div class="todo-empty" id="todoEmpty">输入你想做的事，点 ✨ 解析 开始</div>
+
+      <!-- 操作按钮 -->
+      <div class="todo-actions" id="todoActions" style="display:none;">
+        <button class="btn-cancel" id="cancelBtn">✕ 取消此清单</button>
+        <button class="btn-confirm" id="confirmBtn">✓ 确认打卡</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /grid -->
+
+  <!-- ====== 晚间日记（夜间模式） ====== -->
+  <div class="diary-card fade-in fade-in-d4 max-w-3xl mx-auto" id="diaryCard">
+    <div class="todo-header">
+      <div class="todo-header-left">
+        <span class="todo-title">晚间日记</span>
+        <span class="diary-saved-hint" id="diarySavedHint"></span>
+      </div>
+      <div class="todo-header-right">
+        <button class="history-header-btn" id="diaryHistoryToggleBtn">📖 历史</button>
+      </div>
+    </div>
+    <textarea class="diary-textarea" id="diaryInput" placeholder="今天有什么想记下来的？" rows="3"></textarea>
+    <div class="diary-save-row">
+      <span style="font-size:12px;color:#BFB5A5;" id="diaryDateLabel"></span>
+      <button class="todo-btn" id="diarySaveBtn">保存</button>
+    </div>
+    <div class="diary-history-list" id="diaryHistoryList"></div>
+    <div class="diary-history-empty" id="diaryHistoryEmpty" style="display:none;">还没有写过日记</div>
+  </div>
+
+  <!-- ====== 内心气象 ====== -->
+  <div class="mood-card max-w-3xl mx-auto" id="moodCard" style="animation: fadeIn 0.7s ease-out both; animation-delay: 0.65s; opacity: 0;">
+    <div class="todo-header" style="margin-bottom:12px;">
+      <span class="todo-title">内心气象</span>
+    </div>
+    <div class="mood-row" id="moodRow"></div>
+  </div>
+
+  <!-- ====== 今日状态追踪 ====== -->
+  <div class="tracker-card fade-in-d4 max-w-3xl mx-auto" id="trackerCard" style="animation: fadeIn 0.7s ease-out both;">
+    <div class="tracker-header" id="trackerToggle">
+      <span class="tracker-title">今日状态</span>
+      <span class="tracker-arrow" id="trackerArrow">▼</span>
+    </div>
+    <div class="tracker-body" id="trackerBody">
+      <div class="tracker-row">
+        <span class="tracker-label">今日精力</span>
+        <div class="dot-rating" id="ratingEnergy"></div>
+      </div>
+      <div class="tracker-row">
+        <span class="tracker-label">今日情绪</span>
+        <div class="dot-rating" id="ratingMood"></div>
+      </div>
+      <div class="tracker-row">
+        <span class="tracker-label">今日专注度</span>
+        <div class="dot-rating" id="ratingFocus"></div>
+      </div>
+      <div class="habit-row">
+        <button class="habit-btn" id="habitWater">💧 喝水达标</button>
+        <button class="habit-btn" id="habitExercise">🏃 运动30分钟</button>
+        <button class="habit-btn" id="habitRead">📖 阅读30分钟</button>
+      </div>
+      <div class="tracker-summary" id="trackerSummary" style="display:none;"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ====== 历史清单 Modal ====== -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">📋 历史清单</span>
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+    </div>
+    <div class="modal-list" id="modalList"></div>
+    <div class="history-empty" id="modalEmpty">还没有保存过清单</div>
+  </div>
+</div>
+
+<!-- ====== AI 对话悬浮按钮 ====== -->
+<button class="chat-fab" id="chatFab" title="AI 对话">💬</button>
+
+<!-- ====== AI 对话弹窗 ====== -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-panel">
+    <div class="chat-panel-header">
+      <span class="chat-panel-title">AI 对话</span>
+      <button class="chat-panel-close" id="chatClose">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty-state">想聊点什么？我会尽力回答。</div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="chatInput" placeholder="输入你的问题..." autocomplete="off">
+      <button class="chat-send-btn" id="chatSend">发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 季节切换器 ====== -->
+<div class="season-dots" id="seasonDots" title="季节主题">
+  <button class="season-dot" data-season="spring" title="春季 · 自动"></button>
+  <button class="season-dot" data-season="summer" title="夏季 · 自动"></button>
+  <button class="season-dot" data-season="autumn" title="秋季 · 自动"></button>
+  <button class="season-dot" data-season="winter" title="冬季 · 自动"></button>
+</div>
+
+<script>
+// ============================================================
+// 季节主题
+// ============================================================
+var SEASONS = {
+  spring: {
+    bg: '#F5FAF0', nightBg: '#EAF0E5',
+    accent: '#A0B88C', accentHover: '#8DA67A', accentLight: '#F0F5EC',
+    accentRgb: '160,184,140'
+  },
+  summer: {
+    bg: '#FEF9F0', nightBg: '#F2E8DC',
+    accent: '#F0A040', accentHover: '#D99035', accentLight: '#FFF7EF',
+    accentRgb: '240,160,64'
+  },
+  autumn: {
+    bg: '#FBF2E5', nightBg: '#F0E4D5',
+    accent: '#D4784C', accentHover: '#C06840', accentLight: '#FDF0E8',
+    accentRgb: '212,120,76'
+  },
+  winter: {
+    bg: '#F5F3F0', nightBg: '#EBE8E5',
+    accent: '#E89540', accentHover: '#D98535', accentLight: '#FFF7EF',
+    accentRgb: '232,149,64'
+  }
+};
+
+var SEASON_KEYS = ['spring', 'summer', 'autumn', 'winter'];
+var SEASON_LABELS = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
+var LS_SEASON = 'dz_season';
+
+function getSeasonByMonth() {
+  var m = new Date().getMonth() + 1;
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  if (m >= 9 && m <= 11) return 'autumn';
+  return 'winter';
+}
+
+function getSeason() {
+  var manual = localStorage.getItem(LS_SEASON);
+  if (manual && SEASONS[manual]) return manual;
+  return getSeasonByMonth();
+}
+
+function applySeason(season) {
+  var s = SEASONS[season];
+  var root = document.documentElement;
+  var body = document.body;
+  // 禁用过渡 → 瞬间生效
+  var prev = body.style.transition;
+  body.style.transition = 'none';
+  root.style.setProperty('--bg', s.bg);
+  root.style.setProperty('--night-bg', s.nightBg);
+  root.style.setProperty('--accent', s.accent);
+  root.style.setProperty('--accent-hover', s.accentHover);
+  root.style.setProperty('--accent-light', s.accentLight);
+  root.style.setProperty('--accent-rgb', s.accentRgb);
+  body.offsetHeight; // 强制重排
+  body.style.transition = prev;
+  updateSeasonDots(season);
+  refreshSeasonAmbient();
+}
+
+function updateSeasonDots(season) {
+  var dots = document.querySelectorAll('.season-dot');
+  var isManual = localStorage.getItem(LS_SEASON) !== null;
+  for (var i = 0; i < dots.length; i++) {
+    var dot = dots[i];
+    dot.classList.toggle('active', dot.getAttribute('data-season') === season);
+    if (isManual && dot.getAttribute('data-season') === season) {
+      dot.title = SEASON_LABELS[season] + ' · 手动（点击恢复自动）';
+    } else {
+      dot.title = SEASON_LABELS[dot.getAttribute('data-season')] + ' · 自动';
+    }
+  }
+}
+
+function handleSeasonClick(e) {
+  var season = e.target.getAttribute('data-season');
+  if (!season) return;
+  var current = getSeason();
+  if (season === current && localStorage.getItem(LS_SEASON)) {
+    // 再次点击当前手动季 → 恢复自动
+    localStorage.removeItem(LS_SEASON);
+    applySeason(getSeasonByMonth());
+  } else {
+    localStorage.setItem(LS_SEASON, season);
+    applySeason(season);
+  }
+}
+
+function initSeason() {
+  applySeason(getSeason());
+  var dots = document.getElementById('seasonDots');
+  dots.addEventListener('click', handleSeasonClick);
+}
+
+// ============================================================
+// 季节氛围动画（天气卡片内）
+// ============================================================
+function shouldShowSeasonAmbient(code) {
+  if (code === undefined || code === null) return false;
+  // 雨天、雪天、雷暴 → 优先展示实时天气动画
+  var isRain = (code >= 51 && code <= 65) || (code >= 80 && code <= 82);
+  var isSnow = (code >= 71 && code <= 77) || code === 85 || code === 86;
+  var isStorm = code >= 95 && code <= 99;
+  return !isRain && !isSnow && !isStorm;
+}
+
+function renderSeasonAmbient(code) {
+  var ambient = document.getElementById('seasonAmbient');
+  if (!ambient) return;
+
+  if (!shouldShowSeasonAmbient(code)) {
+    ambient.innerHTML = '';
+    return;
+  }
+
+  var season = getSeason();
+  var html = '';
+
+  if (season === 'spring') {
+    var petalCount = 12 + Math.floor(Math.random() * 8); // 12-19
+    for (var i = 0; i < petalCount; i++) {
+      var pSize = 5 + Math.random() * 5;
+      var pLeft = 1 + Math.random() * 98;
+      var pDur = 14 + Math.random() * 12;
+      var pDelay = Math.random() * 16;
+      html += '<div class="sa-particle sa-petal" style="left:' + pLeft.toFixed(0) + '%;width:' + pSize.toFixed(0) + 'px;height:' + pSize.toFixed(0) + 'px;animation-duration:' + pDur.toFixed(1) + 's;animation-delay:' + pDelay.toFixed(1) + 's;"></div>';
+    }
+  } else if (season === 'summer') {
+    html = '<div class="sa-sunbeam"></div><div class="sa-sunbeam"></div><div class="sa-sunbeam" style="left:70%;width:18%;background:linear-gradient(158deg,rgba(var(--accent-rgb,240,160,64),0.08) 0%,rgba(var(--accent-rgb,240,160,64),0.02) 25%,transparent 55%);transform:skewX(-9deg);animation-delay:-15s;animation-duration:26s;"></div>';
+  } else if (season === 'autumn') {
+    var leafCount = 10 + Math.floor(Math.random() * 7); // 10-16
+    for (var j = 0; j < leafCount; j++) {
+      var lLeft = 1 + Math.random() * 97;
+      var lDur = 15 + Math.random() * 14;
+      var lDelay = Math.random() * 18;
+      var lRot = Math.random() > 0.5 ? '' : 'transform:scaleX(-1);';
+      html += '<div class="sa-particle sa-leaf" style="left:' + lLeft.toFixed(0) + '%;animation-duration:' + lDur.toFixed(1) + 's;animation-delay:' + lDelay.toFixed(1) + 's;' + lRot + '"></div>';
+    }
+  } else if (season === 'winter') {
+    var snowCount = 12 + Math.floor(Math.random() * 8); // 12-19
+    for (var k = 0; k < snowCount; k++) {
+      var sSize = 3 + Math.random() * 7;
+      var sLeft = 1 + Math.random() * 97;
+      var sDur = 16 + Math.random() * 14;
+      var sDelay = Math.random() * 20;
+      html += '<div class="sa-particle sa-snow" style="left:' + sLeft.toFixed(0) + '%;width:' + sSize.toFixed(0) + 'px;height:' + sSize.toFixed(0) + 'px;animation-duration:' + sDur.toFixed(1) + 's;animation-delay:' + sDelay.toFixed(1) + 's;"></div>';
+    }
+  }
+
+  ambient.innerHTML = html;
+}
+
+function refreshSeasonAmbient() {
+  if (lastWeatherData && lastWeatherData.current) {
+    renderSeasonAmbient(lastWeatherData.current.weather_code);
+  }
+}
+
+// ============================================================
+// 时间
+// ============================================================
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clock').textContent =
+    String(now.getHours()).padStart(2,'0') + ':' +
+    String(now.getMinutes()).padStart(2,'0') + ':' +
+    String(now.getSeconds()).padStart(2,'0');
+}
+
+// ============================================================
+// 夜间模式判断
+// ============================================================
+function isNightMode() {
+  var h = new Date().getHours();
+  return h >= 20 || h < 5;
+}
+
+var currentMode = null; // 'day' | 'night'
+
+function getMode() {
+  return isNightMode() ? 'night' : 'day';
+}
+
+// ============================================================
+// 问候语
+// ============================================================
+function getGreeting() {
+  var h = new Date().getHours();
+  var g, l;
+
+  if (isNightMode()) {
+    // 晚间模式：结合天气
+    var weatherSuffix = '';
+    if (lastWeatherData) {
+      var w = WMO[lastWeatherData.current.weather_code] || ['', ''];
+      var temp = lastWeatherData.current.temperature_2m;
+      var city = lastWeatherCity || '';
+      if (w[1] && temp !== undefined) {
+        weatherSuffix = '外面' + (city ? ' ' + city : '') + '现在' + w[1] + '，' + temp + '°C。';
+      }
+    }
+    g = ['晚上好，今天辛苦了。','夜深了，该歇一歇了。','晚安前的安静时刻。'][Math.floor(Math.random()*3)];
+    l = weatherSuffix + ['泡杯热茶，回顾一下这一天吧。','无论今天过得怎样，都值得被记录下来。','安静地坐一会儿，想想今天的小确幸。'][Math.floor(Math.random()*3)];
+    return g + ' ' + l;
+  }
+
+  // 白天模式保持原样
+  if (h >= 5 && h < 9) {
+    g = ['清晨好','早安，天刚亮','早上好呀'][Math.floor(Math.random()*3)];
+    l = ['慢慢来，先泡杯热茶，今天只做重要的事。','晨光刚好，一切都不急，从容开始就好。','推开窗，深呼吸，新的一天悄悄开始了。'][Math.floor(Math.random()*3)];
+  } else if (h >= 9 && h < 12) {
+    g = ['上午好','今天看起来不错','阳光正好'][Math.floor(Math.random()*3)];
+    l = ['专注的时刻到了，但也别忘了偶尔抬头看看窗外。','不慌不忙，把最重要的一件事先做好。','事情一件件来，不需要一次做完所有。'][Math.floor(Math.random()*3)];
+  } else if (h >= 12 && h < 14) {
+    g = ['中午好','午安'][Math.floor(Math.random()*2)];
+    l = ['该吃午饭了，好好犒劳一下自己。','休息一下，下午还有好时光等着你。','天气不错的话，吃完饭出去走走吧。'][Math.floor(Math.random()*3)];
+  } else if (h >= 14 && h < 18) {
+    g = ['下午好','午后安好','阳光斜照'][Math.floor(Math.random()*3)];
+    l = ['午后最安静，适合做一点需要沉下心的事。','再坚持一下，今天的进度已经很好了。','泡第二杯茶了吗？别忘了一边工作一边照顾自己。'][Math.floor(Math.random()*3)];
+  } else if (h >= 18 && h < 20) {
+    g = ['傍晚好','天色渐暗'][Math.floor(Math.random()*2)];
+    l = ['一天的工作该结束了，把时间还给自己。','晚饭后散个步，看看天空的颜色。','关掉屏幕，做些让心静下来的事。'][Math.floor(Math.random()*3)];
+  }
+  return g + '。' + l;
+}
+
+// ============================================================
+// 天气（Open-Meteo 免费 API）
+// ============================================================
+var REFRESH_MS = 30 * 60 * 1000;
+var weatherTimer = null;
+var lastWeatherData = null;
+var lastWeatherCity = '';
+
+var WMO = {
+  0:['☀️','晴'],1:['🌤️','大部晴'],2:['⛅','多云'],3:['☁️','阴'],
+  45:['🌫️','雾'],48:['🌫️','浓雾'],
+  51:['🌦️','小雨'],53:['🌦️','小雨'],55:['🌧️','中雨'],
+  61:['🌧️','小雨'],63:['🌧️','中雨'],65:['🌧️','大雨'],
+  71:['🌨️','小雪'],73:['🌨️','中雪'],75:['❄️','大雪'],
+  80:['🌦️','阵雨'],81:['🌧️','阵雨'],82:['🌧️','大阵雨'],
+  85:['🌨️','阵雪'],86:['🌨️','阵雪'],
+  95:['⛈️','雷暴'],96:['⛈️','雷暴+冰雹'],99:['⛈️','强雷暴'],
+};
+
+var LS_LAT = 'dz_lat', LS_LON = 'dz_lon', LS_CITY = 'dz_city';
+
+function getSceneType(code) {
+  if (code === 0 || code === 1) return 'sunny';
+  if (code === 2) return 'cloudy';
+  if (code === 3 || code === 45 || code === 48) return 'overcast';
+  if ((code >= 51 && code <= 65) || (code >= 80 && code <= 82) || (code >= 95 && code <= 99)) return 'rain';
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+  return 'cloudy';
+}
+
+function renderWeatherScene(code) {
+  var type = getSceneType(code);
+  var el = document.getElementById('weatherScene');
+
+  if (type === 'sunny') {
+    el.innerHTML = '<div class="scene-sunny">' +
+      '<div class="sun-core"></div>' +
+      [0,45,90,135,180,225,270,315].map(function(d) {
+        return '<span class="ray" style="transform:rotate(' + d + 'deg)"></span>';
+      }).join('') +
+    '</div>';
+  } else if (type === 'cloudy') {
+    el.innerHTML = '<div class="scene-cloudy">' +
+      '<div class="sun-small"></div>' +
+      '<div class="cloud c1" style="left:2px;"></div>' +
+      '<div class="cloud c2" style="right:-2px;"></div>' +
+    '</div>';
+  } else if (type === 'overcast') {
+    el.innerHTML = '<div class="scene-overcast">' +
+      '<div class="cloud c1" style="left:-4px;bottom:14px;"></div>' +
+      '<div class="cloud c2" style="right:-2px;bottom:24px;"></div>' +
+      '<div class="cloud c3" style="left:8px;bottom:32px;"></div>' +
+    '</div>';
+  } else if (type === 'rain') {
+    var lines = '';
+    for (var i = 0; i < 7; i++) {
+      lines += '<div class="rain-line" style="left:' + (6 + i * 8) + 'px;animation-delay:' + (i * 0.14).toFixed(2) + 's"></div>';
+    }
+    el.innerHTML = '<div class="scene-rain"><div class="cloud-top"></div>' + lines + '</div>';
+  } else if (type === 'snow') {
+    var dots = '';
+    for (var j = 0; j < 8; j++) {
+      var s = 2.5 + Math.random() * 3;
+      dots += '<div class="snow-dot" style="left:' + (4 + j * 7) + 'px;width:' + s + 'px;height:' + s + 'px;animation-duration:' + (2.5 + Math.random() * 3).toFixed(1) + 's;animation-delay:' + (j * 0.5).toFixed(2) + 's"></div>';
+    }
+    el.innerHTML = '<div class="scene-snow"><div class="cloud-top"></div>' + dots + '</div>';
+  }
+}
+
+async function getLocation() {
+  try {
+    var pos = await new Promise(function(res, rej) {
+      navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000, maximumAge: 600000 });
+    });
+    localStorage.setItem(LS_LAT, pos.coords.latitude);
+    localStorage.setItem(LS_LON, pos.coords.longitude);
+    return { lat: pos.coords.latitude, lon: pos.coords.longitude };
+  } catch (e) { console.log('浏览器定位不可用'); }
+
+  var clat = localStorage.getItem(LS_LAT), clon = localStorage.getItem(LS_LON);
+  if (clat && clon) return { lat: parseFloat(clat), lon: parseFloat(clon) };
+  return null;
+}
+
+async function fetchWeather(lat, lon) {
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&forecast_days=3';
+  var r = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!r.ok) throw new Error('天气服务不可用');
+  return await r.json();
+}
+
+async function getCityName(lat, lon) {
+  try {
+    var r = await fetch(
+      'https://geocoding-api.open-meteo.com/v1/search?latitude=' + lat + '&longitude=' + lon + '&count=1&language=zh',
+      { signal: AbortSignal.timeout(5000) });
+    var d = await r.json();
+    if (d.results && d.results.length > 0) return d.results[0].name || d.results[0].admin1;
+  } catch (e) {}
+  return null;
+}
+
+async function searchCity(name) {
+  if (!name.trim()) return;
+  try {
+    var r = await fetch(
+      'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(name) + '&count=1&language=zh',
+      { signal: AbortSignal.timeout(8000) });
+    var d = await r.json();
+    if (d.results && d.results.length > 0) {
+      var c = d.results[0];
+      localStorage.setItem(LS_LAT, c.latitude); localStorage.setItem(LS_LON, c.longitude);
+      localStorage.setItem(LS_CITY, c.name);
+      lastWeatherCity = c.name;
+      var w = await fetchWeather(c.latitude, c.longitude);
+      renderWeather(w, c.name);
+    } else {
+      showWeatherError('找不到这个城市，换一个试试？');
+    }
+  } catch (e) { showWeatherError('天气查询失败，请稍后再试'); }
+}
+
+function renderWeather(data, city) {
+  lastWeatherData = data;
+  lastWeatherCity = city || '';
+  var c = data.current, d = data.daily, w = WMO[c.weather_code] || ['🌤️','--'];
+  renderWeatherScene(c.weather_code);
+  document.getElementById('weatherTemp').innerHTML       = c.temperature_2m + '<sup>°C</sup>';
+  document.getElementById('weatherDesc').textContent     = w[1];
+  document.getElementById('weatherHumidity').textContent = c.relative_humidity_2m + '%';
+  document.getElementById('weatherLocation').textContent = city || '附近';
+  var fe = document.getElementById('weatherForecast');
+  fe.innerHTML = '';
+  for (var i = 1; i <= 2; i++) {
+    var we = WMO[d.weather_code[i]] || ['🌤️'];
+    fe.innerHTML += '<div class="forecast-day"><div class="day-label">' + ['明天','后天'][i-1] + '</div><div class="day-emoji">' + we[0] + '</div><div class="day-temp">' + d.temperature_2m_max[i] + '° / ' + d.temperature_2m_min[i] + '°</div></div>';
+  }
+  document.getElementById('weatherLoading').style.display  = 'none';
+  document.getElementById('weatherContent').style.display  = 'block';
+  document.getElementById('weatherFallback').style.display = 'none';
+  document.getElementById('weatherError').style.display    = 'none';
+  // 天气加载后刷新问候语（夜间模式需要天气信息）
+  if (isNightMode()) {
+    document.getElementById('greeting').textContent = getGreeting();
+  }
+  renderSeasonAmbient(c.weather_code);
+}
+
+function showWeatherError(msg) {
+  document.getElementById('weatherLoading').style.display  = 'none';
+  document.getElementById('weatherContent').style.display  = 'none';
+  document.getElementById('weatherError').style.display    = 'block';
+  document.getElementById('weatherError').textContent      = msg || '天气加载失败';
+  document.getElementById('weatherFallback').style.display = 'block';
+}
+
+async function loadWeather(lat, lon, knownCity) {
+  try {
+    var data = await fetchWeather(lat, lon);
+    var city = knownCity || localStorage.getItem(LS_CITY) || null;
+    if (!city) { city = await getCityName(lat, lon); if (city) localStorage.setItem(LS_CITY, city); }
+    renderWeather(data, city);
+  } catch (e) { showWeatherError('天气加载失败，试试手动输入城市'); }
+}
+
+async function initWeather() {
+  var loc = await getLocation();
+  if (loc) {
+    await loadWeather(loc.lat, loc.lon, null);
+  } else {
+    document.getElementById('weatherLoading').style.display  = 'none';
+    document.getElementById('weatherFallback').style.display = 'block';
+  }
+  if (weatherTimer) clearInterval(weatherTimer);
+  weatherTimer = setInterval(async function() {
+    var lat = localStorage.getItem(LS_LAT), lon = localStorage.getItem(LS_LON);
+    if (lat && lon) {
+      try { var d = await fetchWeather(parseFloat(lat), parseFloat(lon)); renderWeather(d, localStorage.getItem(LS_CITY) || ''); } catch (e) {}
+    }
+  }, REFRESH_MS);
+}
+
+function bindWeatherEvents() {
+  var inp = document.getElementById('cityInput');
+  inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') searchCity(inp.value); });
+  inp.addEventListener('blur', function() { if (inp.value.trim()) searchCity(inp.value); });
+}
+
+// ============================================================
+// 今日待办（DeepSeek AI 解析 + localStorage）
+// ============================================================
+var PROXY_URL      = '/api/deepseek-proxy';
+var DEEPSEEK_MODEL = 'deepseek-chat';
+var LS_TODOS       = 'dz_todos';
+var LS_TODO_DATE   = 'dz_todo_date';
+var LS_HISTORY     = 'dz_history';
+var LS_COLLAPSED   = 'dz_collapsed';
+
+// --- 当前待办 ---
+function loadTodos() {
+  try { return JSON.parse(localStorage.getItem(LS_TODOS)) || []; } catch (e) { return []; }
+}
+function saveTodos(todos) { localStorage.setItem(LS_TODOS, JSON.stringify(todos)); }
+
+function cleanDoneIfNewDay() {
+  var today = new Date().toDateString();
+  var last  = localStorage.getItem(LS_TODO_DATE);
+  if (last !== today) {
+    localStorage.setItem(LS_TODO_DATE, today);
+    var todos = loadTodos().filter(function(t) { return !t.done; });
+    saveTodos(todos);
+    return todos;
+  }
+  return loadTodos();
+}
+
+// --- 历史清单 ---
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(LS_HISTORY)) || []; } catch (e) { return []; }
+}
+function saveHistory(list) { localStorage.setItem(LS_HISTORY, JSON.stringify(list)); }
+
+function addToHistory(items) {
+  var history = loadHistory();
+  history.unshift({
+    id: Date.now(),
+    dateKey: new Date().toISOString().split('T')[0],
+    date: new Date().toLocaleString('zh-CN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }),
+    items: items.map(function(t) { return { text: t.text, done: t.done }; })
+  });
+  if (history.length > 20) history = history.slice(0, 20);
+  saveHistory(history);
+  updateHistoryBadge();
+}
+
+function deleteHistory(id) {
+  var history = loadHistory().filter(function(h) { return h.id !== id; });
+  saveHistory(history);
+  updateHistoryBadge();
+  renderHistoryModal();
+}
+
+function updateHistoryBadge() {
+  var badge = document.getElementById('historyBadge');
+  var count = loadHistory().length;
+  if (count > 0) {
+    badge.style.display = 'inline-flex';
+    badge.textContent = count > 99 ? '99+' : count;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderHistoryModal() {
+  var history = loadHistory();
+  var list    = document.getElementById('modalList');
+  var empty   = document.getElementById('modalEmpty');
+
+  if (history.length === 0) {
+    list.innerHTML = '';
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  list.style.display = 'block';
+  empty.style.display = 'none';
+
+  list.innerHTML = history.map(function(entry) {
+    var itemsHtml = entry.items.map(function(item) {
+      return '<div class="history-entry-item' + (item.done ? ' done' : '') + '">' +
+        (item.done ? '✓ ' : '○ ') + escapeHtml(item.text) + '</div>';
+    }).join('');
+    return '<div class="history-entry">' +
+      '<div class="history-entry-header">' +
+        '<span class="history-entry-date">' + escapeHtml(entry.date) + '</span>' +
+        '<button class="history-entry-delete" onclick="deleteHistory(' + entry.id + ')" title="删除">✕</button>' +
+      '</div>' +
+      '<div class="history-entry-items">' + itemsHtml + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// --- 渲染待办 ---
+function renderTodos() {
+  var todos   = cleanDoneIfNewDay();
+  var list    = document.getElementById('todoList');
+  var empty   = document.getElementById('todoEmpty');
+  var actions = document.getElementById('todoActions');
+
+  if (todos.length === 0) {
+    list.innerHTML = '';
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    actions.style.display = 'none';
+    document.getElementById('parseBadge').style.display = 'none';
+    renderDaySummary();
+    return;
+  }
+  list.style.display = 'block';
+  empty.style.display = 'none';
+  actions.style.display = 'flex';
+
+  list.innerHTML = todos.map(function(t, i) {
+    return '<div class="todo-item' + (t.done ? ' done' : '') + '" onclick="toggleTodo(' + i + ')">' +
+      '<div class="todo-dot">' + (t.done ? '✓' : '') + '</div>' +
+      '<span class="todo-text">' + escapeHtml(t.text) + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function escapeHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// --- 勾选 ---
+function toggleTodo(i) {
+  var todos = loadTodos();
+  if (i >= 0 && i < todos.length) {
+    todos[i].done = !todos[i].done;
+    saveTodos(todos);
+    renderTodos();
+  }
+}
+
+// --- AI 解析 ---
+async function parseTodos() {
+  var input = document.getElementById('todoInput').value.trim();
+  if (!input) return;
+
+  var btn = document.getElementById('todoParseBtn');
+  btn.textContent = '解析中...';
+  btn.disabled = true;
+
+  var items = null;
+  var parseError = null;
+
+  try {
+    var res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages: [
+          { role: 'system', content: '将用户输入拆解为待办事项。以JSON数组返回，每个元素是任务描述字符串。示例输出：["交周报","和朋友吃饭","买牛奶"]。只输出JSON数组，不要任何其他文字。' },
+          { role: 'user', content: input }
+        ],
+        temperature: 0.2,
+        max_tokens: 500
+      })
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    var data = await res.json();
+    console.log('DeepSeek:', data);
+
+    if (data.choices && data.choices[0]) {
+      var raw = data.choices[0].message.content.trim();
+      var json = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      if (json.startsWith('[')) {
+        var end = json.lastIndexOf(']');
+        if (end > 0) json = json.substring(0, end + 1);
+      }
+      var parsed = JSON.parse(json);
+      if (Array.isArray(parsed) && parsed.length > 0) items = parsed;
+    } else if (data.error) {
+      throw new Error(data.error.message || 'API error');
+    }
+  } catch (e) {
+    parseError = e.message;
+    console.log('AI parse failed:', parseError);
+  }
+
+  // 备用
+  if (!items || items.length === 0) {
+    items = input.split(/[，；。,;.！!、\n]+/).map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+    if (items.length === 0) items = [input];
+  }
+
+  // 合并去重
+  var todos = loadTodos();
+  var exist = new Set(todos.map(function(t) { return t.text; }));
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var text = (typeof item === 'string' ? item : (item.text || String(item))).trim();
+    if (text && !exist.has(text)) {
+      todos.push({ text: text, done: false });
+      exist.add(text);
+    }
+  }
+  saveTodos(todos);
+  renderTodos();
+  document.getElementById('todoInput').value = '';
+
+  // 显示 AI 解析标记
+  var badge = document.getElementById('parseBadge');
+  badge.style.display = 'inline-block';
+  badge.textContent = parseError ? '离线拆分' : 'AI 解析';
+  if (parseError) badge.style.background = '#F5F0E8'; else badge.style.background = 'var(--accent-light, #FFF7EF)';
+
+  btn.textContent = parseError ? '⚠ 离线' : '✓ 完成';
+  setTimeout(function() {
+    btn.textContent = '✨ 解析';
+    btn.disabled = false;
+  }, 1500);
+}
+
+// --- 取消清单 ---
+function cancelTodos() {
+  if (loadTodos().length === 0) return;
+  saveTodos([]);
+  renderTodos();
+}
+
+// --- 确认打卡 ---
+function confirmTodos() {
+  var todos = loadTodos();
+  if (todos.length === 0) return;
+  // 保留实际完成状态，不强制全部标记为 done
+  addToHistory(todos);
+  saveTodos([]);
+  renderTodos();
+  showToast('✓ 已保存到历史清单');
+}
+
+// --- Toast ---
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#3D3226;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:200;pointer-events:none;transition:all 0.4s;opacity:0;';
+  document.body.appendChild(t);
+  requestAnimationFrame(function() { t.style.opacity = '1'; });
+  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 2000);
+}
+
+// --- 折叠/展开 ---
+function toggleCollapse() {
+  var body = document.getElementById('todoBody');
+  var btn  = document.getElementById('collapseBtn');
+  var collapsed = body.classList.toggle('collapsed');
+  btn.classList.toggle('collapsed', collapsed);
+  btn.textContent = collapsed ? '▶' : '▼';
+  localStorage.setItem(LS_COLLAPSED, collapsed ? '1' : '0');
+}
+
+function initCollapse() {
+  var collapsed = localStorage.getItem(LS_COLLAPSED) === '1';
+  if (collapsed) {
+    document.getElementById('todoBody').classList.add('collapsed');
+    document.getElementById('collapseBtn').classList.add('collapsed');
+    document.getElementById('collapseBtn').textContent = '▶';
+  }
+}
+
+// ============================================================
+// 今日总结（夜间模式）
+// ============================================================
+function getTodaySummary() {
+  var today = new Date().toISOString().split('T')[0];
+  var history = loadHistory();
+  var total = 0, done = 0;
+
+  // 统计今天的历史条目
+  for (var i = 0; i < history.length; i++) {
+    if (history[i].dateKey === today) {
+      for (var j = 0; j < history[i].items.length; j++) {
+        total++;
+        if (history[i].items[j].done) done++;
+      }
+    }
+  }
+
+  // 加上当前待办
+  var todos = loadTodos();
+  for (var k = 0; k < todos.length; k++) {
+    total++;
+    if (todos[k].done) done++;
+  }
+
+  return { total: total, done: done };
+}
+
+function renderDaySummary() {
+  var section = document.getElementById('daySummary');
+  if (!isNightMode()) {
+    section.style.display = 'none';
+    return;
+  }
+
+  var s = getTodaySummary();
+  var statsEl = document.getElementById('summaryStats');
+  var feedbackEl = document.getElementById('summaryFeedback');
+
+  if (s.total === 0) {
+    statsEl.innerHTML = '今天没有记录待办事项';
+    feedbackEl.textContent = '放松的一天，享受这份闲适吧。';
+  } else {
+    statsEl.innerHTML = '今天完成了 <span class="highlight">' + s.done + '/' + s.total + '</span> 项任务';
+    if (s.done >= s.total) {
+      feedbackEl.textContent = '太棒了！今天所有计划都完成了，好好犒赏自己吧 ✨';
+    } else if (s.done >= s.total / 2) {
+      feedbackEl.textContent = '今天进展不错，完成了一大半。剩下的不急，明天继续就好。';
+    } else {
+      feedbackEl.textContent = '今天也许有些疲惫，没关系，休息也是重要的事。对自己温柔一点 🌙';
+    }
+  }
+
+  section.style.display = 'block';
+}
+
+// ============================================================
+// 晚间日记
+// ============================================================
+var LS_DIARY = 'dz_diary';
+
+function loadDiaryEntries() {
+  try { return JSON.parse(localStorage.getItem(LS_DIARY)) || []; } catch (e) { return []; }
+}
+
+function saveDiaryEntries(entries) { localStorage.setItem(LS_DIARY, JSON.stringify(entries)); }
+
+function getTodayDiary() {
+  var today = new Date().toISOString().split('T')[0];
+  var entries = loadDiaryEntries();
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].dateKey === today) return entries[i];
+  }
+  return null;
+}
+
+function saveDiary() {
+  var text = document.getElementById('diaryInput').value.trim();
+  if (!text) return;
+
+  var today = new Date().toISOString().split('T')[0];
+  var dateLabel = new Date().toLocaleString('zh-CN', { month:'long', day:'numeric', weekday:'short' });
+  var entries = loadDiaryEntries();
+
+  // 查找今天是否已有日记
+  var found = false;
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].dateKey === today) {
+      entries[i].text = text;
+      entries[i].updatedAt = Date.now();
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    entries.unshift({
+      dateKey: today,
+      dateLabel: dateLabel,
+      text: text,
+      createdAt: Date.now()
+    });
+    // 最多保留 60 条
+    if (entries.length > 60) entries = entries.slice(0, 60);
+  }
+
+  saveDiaryEntries(entries);
+
+  // 显示已保存提示
+  var hint = document.getElementById('diarySavedHint');
+  hint.textContent = '已保存 ✓';
+  hint.style.opacity = '1';
+  setTimeout(function() { hint.style.opacity = '0'; }, 2000);
+
+  document.getElementById('diaryDateLabel').textContent = dateLabel;
+}
+
+function renderDiary() {
+  var card = document.getElementById('diaryCard');
+  if (!isNightMode()) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = 'block';
+
+  var today = new Date().toISOString().split('T')[0];
+  var dateLabel = new Date().toLocaleString('zh-CN', { month:'long', day:'numeric', weekday:'short' });
+  var existing = getTodayDiary();
+
+  document.getElementById('diaryDateLabel').textContent = dateLabel;
+  document.getElementById('diaryInput').value = existing ? existing.text : '';
+  document.getElementById('diarySavedHint').textContent = '';
+  document.getElementById('diarySaveBtn').textContent = existing ? '更新' : '保存';
+
+  // 如果日记历史列表正在展示，刷新它
+  if (document.getElementById('diaryHistoryList').style.display === 'block') {
+    renderDiaryHistory();
+  }
+}
+
+function toggleDiaryHistory() {
+  var list = document.getElementById('diaryHistoryList');
+  var empty = document.getElementById('diaryHistoryEmpty');
+  if (list.style.display === 'block') {
+    list.style.display = 'none';
+    empty.style.display = 'none';
+  } else {
+    renderDiaryHistory();
+    list.style.display = 'block';
+  }
+}
+
+function renderDiaryHistory() {
+  var entries = loadDiaryEntries();
+  var list = document.getElementById('diaryHistoryList');
+  var empty = document.getElementById('diaryHistoryEmpty');
+
+  // 排除今天的（已在编辑区）
+  var today = new Date().toISOString().split('T')[0];
+  var past = entries.filter(function(e) { return e.dateKey !== today; });
+
+  if (past.length === 0) {
+    list.innerHTML = '';
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'block';
+  list.innerHTML = past.map(function(entry) {
+    var preview = entry.text.length > 80 ? entry.text.substring(0, 80) + '...' : entry.text;
+    return '<div class="diary-history-item">' +
+      '<div class="dh-date">' + escapeHtml(entry.dateLabel || entry.dateKey) + '</div>' +
+      '<div class="dh-preview">' + escapeHtml(preview) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ============================================================
+// AI 深度对话
+// ============================================================
+var chatMessages = [];
+
+function openChat() {
+  document.getElementById('chatOverlay').classList.add('show');
+  document.getElementById('chatInput').focus();
+}
+
+function closeChat() {
+  document.getElementById('chatOverlay').classList.remove('show');
+  chatMessages = [];
+  document.getElementById('chatMessages').innerHTML = '<div class="chat-empty-state">想聊点什么？我会尽力回答。</div>';
+  document.getElementById('chatInput').value = '';
+}
+
+async function sendChatMessage() {
+  var input = document.getElementById('chatInput').value.trim();
+  if (!input) return;
+
+  var sendBtn = document.getElementById('chatSend');
+  var inputEl = document.getElementById('chatInput');
+  sendBtn.disabled = true;
+  sendBtn.textContent = '...';
+  inputEl.disabled = true;
+
+  appendChatMessage('user', input);
+  chatMessages.push({ role: 'user', content: input });
+  inputEl.value = '';
+
+  var typingEl = appendChatTyping();
+
+  try {
+    var res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages: [
+          { role: 'system', content: '你是一个温暖、体贴的助手。用中文回答问题，简洁有温度。' }
+        ].concat(chatMessages),
+        temperature: 0.7,
+        max_tokens: 600
+      })
+    });
+
+    removeChatTyping(typingEl);
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+
+    if (data.choices && data.choices[0]) {
+      var reply = data.choices[0].message.content.trim();
+      appendChatMessage('ai', reply);
+      chatMessages.push({ role: 'assistant', content: reply });
+    } else if (data.error) {
+      appendChatMessage('ai', '抱歉，出了点问题：' + (data.error.message || '未知错误'));
+    }
+  } catch (e) {
+    removeChatTyping(typingEl);
+    appendChatMessage('ai', '抱歉，网络不太好，等会儿再试试？');
+    console.log('Chat error:', e);
+  }
+
+  sendBtn.disabled = false;
+  sendBtn.textContent = '发送';
+  inputEl.disabled = false;
+  inputEl.focus();
+}
+
+function appendChatMessage(role, text) {
+  var container = document.getElementById('chatMessages');
+  var empty = container.querySelector('.chat-empty-state');
+  if (empty) empty.remove();
+
+  var div = document.createElement('div');
+  div.className = 'chat-msg chat-msg-' + (role === 'user' ? 'user' : 'ai');
+  div.innerHTML = '<div class="chat-msg-bubble">' + escapeHtml(text) + '</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendChatTyping() {
+  var container = document.getElementById('chatMessages');
+  var empty = container.querySelector('.chat-empty-state');
+  if (empty) empty.remove();
+
+  var div = document.createElement('div');
+  div.className = 'chat-msg chat-msg-ai chat-typing';
+  var id = 'chatTyping_' + Date.now();
+  div.id = id;
+  div.innerHTML = '<div class="chat-msg-bubble">思考中...</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeChatTyping(id) {
+  var el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ============================================================
+// 今日状态追踪
+// ============================================================
+var LS_TRACKER = 'dz_tracker';
+var TRACKER_DIMS = [
+  { key: 'energy',  el: 'ratingEnergy' },
+  { key: 'mood',    el: 'ratingMood' },
+  { key: 'focus',   el: 'ratingFocus' }
+];
+var TRACKER_HABITS = [
+  { key: 'water',    el: 'habitWater' },
+  { key: 'exercise', el: 'habitExercise' },
+  { key: 'reading',  el: 'habitRead' }
+];
+
+function loadTracker() {
+  try { return JSON.parse(localStorage.getItem(LS_TRACKER)) || {}; } catch (e) { return {}; }
+}
+function saveTracker(data) { localStorage.setItem(LS_TRACKER, JSON.stringify(data)); }
+
+function getTodayTracker() {
+  var today = new Date().toISOString().split('T')[0];
+  var all = loadTracker();
+  return all[today] || { energy: 0, mood: 0, focus: 0, water: false, exercise: false, reading: false };
+}
+
+function setTodayTracker(updates) {
+  var today = new Date().toISOString().split('T')[0];
+  var all = loadTracker();
+  var current = all[today] || { energy: 0, mood: 0, focus: 0, water: false, exercise: false, reading: false };
+  for (var k in updates) {
+    if (updates.hasOwnProperty(k)) current[k] = updates[k];
+  }
+  all[today] = current;
+  saveTracker(all);
+}
+
+function renderTracker() {
+  var data = getTodayTracker();
+
+  for (var d = 0; d < TRACKER_DIMS.length; d++) {
+    var dim = TRACKER_DIMS[d];
+    var el = document.getElementById(dim.el);
+    var val = data[dim.key] || 0;
+    el.innerHTML = '';
+    for (var i = 1; i <= 5; i++) {
+      var dot = document.createElement('span');
+      dot.className = 'dot' + (i <= val ? ' active' : '');
+      dot.setAttribute('data-dim', dim.key);
+      dot.setAttribute('data-val', i);
+      el.appendChild(dot);
+    }
+  }
+
+  for (var h = 0; h < TRACKER_HABITS.length; h++) {
+    var habit = TRACKER_HABITS[h];
+    var btn = document.getElementById(habit.el);
+    if (data[habit.key]) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
+
+  renderTrackerSummary(data);
+  renderMoodWeather();
+}
+
+function handleDotClick(e) {
+  var dim = e.target.getAttribute('data-dim');
+  var val = parseInt(e.target.getAttribute('data-val'));
+  if (!dim || isNaN(val)) return;
+  var updates = {};
+  updates[dim] = val;
+  setTodayTracker(updates);
+  renderTracker();
+}
+
+function handleHabitClick(key) {
+  var data = getTodayTracker();
+  var updates = {};
+  updates[key] = !data[key];
+  setTodayTracker(updates);
+  renderTracker();
+}
+
+function renderTrackerSummary(data) {
+  var el = document.getElementById('trackerSummary');
+  var scores = [data.energy || 0, data.mood || 0, data.focus || 0].filter(function(s) { return s > 0; });
+
+  if (scores.length === 0) {
+    el.style.display = 'none';
+    return;
+  }
+
+  var avg = scores.reduce(function(a, b) { return a + b; }, 0) / scores.length;
+  var habitCount = (data.water ? 1 : 0) + (data.exercise ? 1 : 0) + (data.reading ? 1 : 0);
+
+  var msg = '';
+  if (avg >= 4) {
+    msg = '今天状态非常好，充满能量的一天 ✨';
+  } else if (avg >= 3) {
+    msg = '今天还算平稳，不疾不徐刚刚好。';
+  } else if (avg >= 2) {
+    msg = '今天有些起伏，但这也没关系。';
+  } else {
+    msg = '今天是需要被温柔对待的一天 🌙';
+  }
+
+  if (habitCount > 0) {
+    msg += ' 还完成了 ' + habitCount + ' 个好习惯' + (habitCount >= 2 ? '，真不错！' : '。');
+  }
+
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function toggleTracker() {
+  var body = document.getElementById('trackerBody');
+  var arrow = document.getElementById('trackerArrow');
+  var open = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+  localStorage.setItem('dz_tracker_open', open ? '1' : '0');
+}
+
+// ============================================================
+// 内心气象
+// ============================================================
+var MOOD_ICONS = { 1: '🌧️', 2: '☁️', 3: '⛅', 4: '🌤️', 5: '☀️' };
+var MOOD_LABELS = { 1: '低落', 2: '沉闷', 3: '平静', 4: '不错', 5: '很好' };
+
+function renderMoodWeather() {
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  var allData = loadTracker();
+  var row = document.getElementById('moodRow');
+  var html = '';
+
+  for (var j = 0; j < days.length; j++) {
+    var dateKey = days[j];
+    var data = allData[dateKey];
+    var d = new Date(dateKey + 'T00:00:00');
+    var label = (d.getMonth() + 1) + '/' + d.getDate();
+    var dayName = ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+
+    if (data && data.mood && data.mood > 0) {
+      var icon = MOOD_ICONS[data.mood] || '⛅';
+      var tip = label + ' ' + dayName + ' · ' + MOOD_LABELS[data.mood] + ' ' + data.mood + ' 分';
+      html += '<div class="mood-day"><span class="mood-icon" title="' + escapeHtml(tip) + '">' + icon + '</span><span class="mood-label">' + label + '</span></div>';
+    } else {
+      html += '<div class="mood-day"><span class="mood-empty" title="' + label + ' ' + dayName + ' · 无记录"></span><span class="mood-label">' + label + '</span></div>';
+    }
+  }
+  row.innerHTML = html;
+}
+
+function initTracker() {
+  renderTracker();
+  var open = localStorage.getItem('dz_tracker_open') === '1';
+  if (open) {
+    document.getElementById('trackerBody').classList.add('open');
+    document.getElementById('trackerArrow').classList.add('open');
+  }
+
+  var trackerCard = document.getElementById('trackerCard');
+  trackerCard.addEventListener('click', function(e) {
+    if (e.target.classList.contains('dot')) {
+      handleDotClick(e);
+    }
+  });
+
+  document.getElementById('habitWater').addEventListener('click', function(e) {
+    e.stopPropagation();
+    handleHabitClick('water');
+  });
+  document.getElementById('habitExercise').addEventListener('click', function(e) {
+    e.stopPropagation();
+    handleHabitClick('exercise');
+  });
+  document.getElementById('habitRead').addEventListener('click', function(e) {
+    e.stopPropagation();
+    handleHabitClick('reading');
+  });
+
+  document.getElementById('trackerToggle').addEventListener('click', toggleTracker);
+}
+
+// ============================================================
+// 时间框图标：太阳 / 月亮
+// ============================================================
+var currentIconMode = null; // 'sun' | 'moon'
+
+var SUN_SVG = '<svg class="sun-icon-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">' +
+  '<defs><radialGradient id="tsGlow" cx="22" cy="22" r="21" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0%" stop-color="#F5C04A" stop-opacity="0.55"/>' +
+    '<stop offset="40%" stop-color="#F5C04A" stop-opacity="0.15"/>' +
+    '<stop offset="100%" stop-color="#F5C04A" stop-opacity="0"/>' +
+  '</radialGradient></defs>' +
+  '<circle cx="22" cy="22" r="20" class="sun-glow-circle" fill="url(#tsGlow)"/>' +
+  '<g class="sun-rays-group">' +
+    '<line x1="22" y1="3"  x2="22" y2="8.5"  stroke="#F5C04A" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>' +
+    '<line x1="22" y1="35.5" x2="22" y2="41" stroke="#F5C04A" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>' +
+    '<line x1="3"  y1="22" x2="8.5"  y2="22" stroke="#F5C04A" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>' +
+    '<line x1="35.5" y1="22" x2="41" y2="22" stroke="#F5C04A" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>' +
+    '<line x1="8.5"  y1="8.5"  x2="12"  y2="12"  stroke="#F5C04A" stroke-width="1" stroke-linecap="round" opacity="0.50"/>' +
+    '<line x1="32"   y1="8.5"  x2="35.5" y2="12"  stroke="#F5C04A" stroke-width="1" stroke-linecap="round" opacity="0.50"/>' +
+    '<line x1="8.5"  y1="35.5" x2="12"  y2="32"  stroke="#F5C04A" stroke-width="1" stroke-linecap="round" opacity="0.50"/>' +
+    '<line x1="32"   y1="35.5" x2="35.5" y2="32"  stroke="#F5C04A" stroke-width="1" stroke-linecap="round" opacity="0.50"/>' +
+  '</g>' +
+  '<circle cx="22" cy="22" r="10" class="sun-core-shape"/>' +
+'</svg>';
+
+var MOON_SVG = '<svg class="moon-icon-svg" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">' +
+  '<defs><radialGradient id="tmGlow" cx="22" cy="22" r="21" gradientUnits="userSpaceOnUse">' +
+    '<stop offset="0%" stop-color="#EEC040" stop-opacity="0.50"/>' +
+    '<stop offset="45%" stop-color="#EEC040" stop-opacity="0.14"/>' +
+    '<stop offset="100%" stop-color="#EEC040" stop-opacity="0"/>' +
+  '</radialGradient></defs>' +
+  '<circle cx="22" cy="22" r="20" class="moon-glow-circle" fill="url(#tmGlow)"/>' +
+  '<circle cx="7" cy="7"   r="1.5" class="star-dot star-1"/>' +
+  '<circle cx="36" cy="10" r="1.2" class="star-dot star-2"/>' +
+  '<circle cx="34" cy="34" r="1.4" class="star-dot star-3"/>' +
+  '<path d="M24,5 A14,14 0 1,0 24,39 A10,10 0 1,1 24,5 Z" class="moon-crescent-shape"/>' +
+'</svg>';
+
+function updateTimeIcon() {
+  var mode = isNightMode() ? 'moon' : 'sun';
+  if (mode === currentIconMode) return;
+  var prev = currentIconMode;
+  currentIconMode = mode;
+  var el = document.getElementById('timeIcon');
+  if (!el) return;
+  // 首次渲染立即显示，避免空白
+  if (prev === null) {
+    el.innerHTML = mode === 'sun' ? SUN_SVG : MOON_SVG;
+    return;
+  }
+  // 切换时淡入淡出
+  el.style.opacity = '0';
+  setTimeout(function() {
+    el.innerHTML = mode === 'sun' ? SUN_SVG : MOON_SVG;
+    el.style.opacity = '1';
+  }, 180);
+}
+
+// ============================================================
+// 夜间模式应用
+// ============================================================
+function applyNightMode() {
+  var isNight = isNightMode();
+  document.body.classList.toggle('night-mode', isNight);
+
+  // 刷新问候语
+  document.getElementById('greeting').textContent = getGreeting();
+
+  // 今日总结
+  renderDaySummary();
+
+  // 日记
+  renderDiary();
+
+  // 时间图标
+  updateTimeIcon();
+}
+
+function checkModeSwitch() {
+  var mode = getMode();
+  if (mode !== currentMode) {
+    currentMode = mode;
+    applyNightMode();
+  }
+}
+
+// ============================================================
+// 事件绑定
+// ============================================================
+function bindEvents() {
+  document.getElementById('todoParseBtn').addEventListener('click', parseTodos);
+  document.getElementById('todoInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') parseTodos();
+  });
+  document.getElementById('cancelBtn').addEventListener('click', function() {
+    if (confirm('确定要清空当前所有待办事项吗？此操作不可恢复。')) cancelTodos();
+  });
+  document.getElementById('confirmBtn').addEventListener('click', function() {
+    confirmTodos();
+  });
+  document.getElementById('collapseBtn').addEventListener('click', toggleCollapse);
+
+  // 历史 Modal
+  document.getElementById('historyBtn').addEventListener('click', function() {
+    renderHistoryModal();
+    document.getElementById('historyModal').classList.add('show');
+  });
+  document.getElementById('modalCloseBtn').addEventListener('click', function() {
+    document.getElementById('historyModal').classList.remove('show');
+  });
+  document.getElementById('historyModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+
+  // 日记保存
+  document.getElementById('diarySaveBtn').addEventListener('click', saveDiary);
+  // 日记历史
+  document.getElementById('diaryHistoryToggleBtn').addEventListener('click', toggleDiaryHistory);
+
+  // AI 对话
+  document.getElementById('chatFab').addEventListener('click', openChat);
+  document.getElementById('chatClose').addEventListener('click', closeChat);
+  document.getElementById('chatOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeChat();
+  });
+  document.getElementById('chatSend').addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendChatMessage();
+  });
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+function init() {
+  updateClock();
+  setInterval(function() {
+    updateClock();
+    checkModeSwitch();
+  }, 1000);
+
+  currentMode = getMode();
+  currentIconMode = null; // 强制首次渲染
+  applyNightMode();
+
+  document.getElementById('greeting').textContent = getGreeting();
+  bindWeatherEvents();
+  initWeather();
+  initCollapse();
+  initSeason();
+  bindEvents();
+  renderTodos();
+  updateHistoryBadge();
+  renderMoodWeather();
+  initTracker();
+  updateTimeIcon();
+}
+init();
+</script>
+</body>
+</html>

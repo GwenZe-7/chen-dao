@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- 清晨天空渐变：暖米色 → 淡蓝白 -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D6E4F0"/>
+      <stop offset="40%" stop-color="#EDE8DF"/>
+      <stop offset="100%" stop-color="#FEF9F0"/>
+    </linearGradient>
+    <!-- 太阳琥珀色渐变 -->
+    <linearGradient id="sunGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FADA9A"/>
+      <stop offset="50%" stop-color="#ECA248"/>
+      <stop offset="100%" stop-color="#E89540"/>
+    </linearGradient>
+    <!-- 太阳光晕 -->
+    <radialGradient id="glow" cx="256" cy="365" r="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F5C878" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#F5C878" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 圆角方形背景 102px ≈ iOS 规范 -->
+  <rect width="512" height="512" rx="102" fill="url(#sky)"/>
+
+  <!-- 太阳光晕层 -->
+  <rect width="512" height="512" rx="102" fill="url(#glow)"/>
+
+  <!-- 太阳 -->
+  <circle cx="256" cy="375" r="82" fill="url(#sunGrad)"/>
+
+  <!-- 远山（后层，较淡） -->
+  <path d="M-10 520 L-10 390 Q180 295 340 365 Q430 340 522 385 L522 520 Z"
+        fill="#DAD3C8" opacity="0.55"/>
+
+  <!-- 近山（前层，主轮廓） -->
+  <path d="M-10 520 L-10 415 Q256 348 522 405 L522 520 Z"
+        fill="#C8BDB0"/>
+</svg>

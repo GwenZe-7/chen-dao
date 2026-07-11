@@ -1,0 +1,8 @@
+{
+  "name": "morning-island",
+  "version": "1.0.0",
+  "description": "晨岛 — Personal Dashboard",
+  "scripts": {
+    "dev": "node server.js"
+  }
+}
